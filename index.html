@@ -1,0 +1,726 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1D2226">
+<title>EL AIDI BETON</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: bandeau hazard sous l'en-tête, onglets, panneaux de saisie à gauche des listes. Industriel, béton + jaune de chantier. */
+:root{
+  --bg:#ECEBE7; --surface:#FBFBF9; --soft:#E4E2DC; --field:#FFFFFF;
+  --ink:#1D2226; --muted:#5F676D; --line:#D3D1CB;
+  --amber:#F2A900; --on-amber:#1D2226;
+  --good:#1F7A4D; --bad:#B3261E; --warn:#8A5A00;
+  --f-display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#15181B; --surface:#1E2327; --soft:#272D32; --field:#12161A;
+  --ink:#ECEBE7; --muted:#9AA1A6; --line:#343B40;
+  --amber:#F2B01E; --good:#55C58A; --bad:#FF8A80; --warn:#E8B04A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#15181B; --surface:#1E2327; --soft:#272D32; --field:#12161A;
+  --ink:#ECEBE7; --muted:#9AA1A6; --line:#343B40;
+  --amber:#F2B01E; --good:#55C58A; --bad:#FF8A80; --warn:#E8B04A; color-scheme:dark}
+
+*{box-sizing:border-box}
+:root{color-scheme:light}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+img{max-width:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 40px}
+h1,h2,h3{font-family:var(--f-display);font-weight:700;letter-spacing:.02em;margin:0;text-wrap:balance}
+h3{font-size:19px;text-transform:uppercase;letter-spacing:.06em}
+.wrap{max-width:1180px;margin:0 auto}
+.num,td.n,th.n{font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.small{font-size:12px}
+
+/* en-tête */
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--surface)}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--surface);
+  margin-inline:calc(-1*max(16px,env(safe-area-inset-left,0px))) calc(-1*max(16px,env(safe-area-inset-right,0px)));
+  padding-inline:max(16px,env(safe-area-inset-left,0px)) max(16px,env(safe-area-inset-right,0px));border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:12px;padding-block:10px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px;min-width:0;flex:1}
+.brand img,.brand svg{width:44px;height:44px;border-radius:6px;flex:none;object-fit:cover}
+.brand b{font-family:var(--f-display);font-size:26px;line-height:1;letter-spacing:.05em;display:block}
+.brand span{font-size:12px;color:var(--muted)}
+.who{display:flex;align-items:center;gap:10px;font-size:13px}
+.who .role{font-size:11px;text-transform:uppercase;letter-spacing:.08em;background:var(--soft);padding:2px 8px;border-radius:3px}
+.hazard{height:6px;margin-inline:calc(-1*max(16px,env(safe-area-inset-left,0px))) calc(-1*max(16px,env(safe-area-inset-right,0px)));
+  background:repeating-linear-gradient(-45deg,var(--amber) 0 12px,var(--ink) 12px 24px)}
+.tabs{display:flex;gap:2px;overflow-x:auto;padding-top:14px;border-bottom:1px solid var(--line);scrollbar-width:thin}
+.tabs button{font:600 14px var(--f-body);background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);padding:10px 16px;cursor:pointer;white-space:nowrap}
+.tabs button[aria-current="page"]{color:var(--ink);border-bottom-color:var(--amber)}
+.tabs button:hover{color:var(--ink)}
+main{padding-top:20px;display:grid;gap:18px}
+
+/* contrôles */
+button,input,select{font:inherit;color:inherit}
+.btn{border:1px solid var(--line);background:var(--surface);padding:9px 14px;border-radius:4px;cursor:pointer;font-weight:600;min-height:40px}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--amber);color:var(--on-amber);border-color:transparent}
+.btn.primary:hover{filter:brightness(.95)}
+.btn.sm{padding:4px 10px;min-height:30px;font-size:12px}
+.link{background:none;border:0;padding:2px 4px;cursor:pointer;color:var(--ink);text-decoration:underline;text-underline-offset:3px;font-size:13px}
+.link.danger{color:var(--bad)}
+.link.armed{background:var(--bad);color:#fff;text-decoration:none;border-radius:3px;padding:2px 8px}
+input,select{background:var(--field);border:1px solid var(--line);border-radius:4px;padding:9px 10px;min-height:40px;width:100%}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--amber);outline-offset:1px}
+.fld{display:grid;gap:4px;min-width:0}
+.fld>span{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;align-items:end}
+.grid .wide{grid-column:1/-1}
+.actions{display:flex;gap:8px;align-items:center}
+.unit{font-size:12px;color:var(--muted)}
+
+/* panneaux */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:16px;display:grid;gap:14px;min-width:0}
+.panel>header{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));gap:18px}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);text-align:left;padding:8px 10px;border-bottom:2px solid var(--ink);white-space:nowrap;font-weight:600}
+td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th.n,td.n{text-align:right;white-space:nowrap}
+tbody tr:hover td{background:var(--soft)}
+tfoot td{font-weight:600;border-top:2px solid var(--ink);border-bottom:0;background:var(--soft)}
+tr.cur td{background:color-mix(in srgb,var(--amber) 22%,transparent)}
+.empty{padding:18px 4px;color:var(--muted)}
+.tag{display:inline-block;font-weight:600;font-size:12px;padding:1px 7px;border-radius:3px;background:var(--soft);border:1px solid var(--line)}
+.pos{color:var(--good)} .neg{color:var(--bad)} .warn{color:var(--warn)}
+
+/* bilan */
+.bilan{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));border:1px solid var(--line);border-radius:6px;background:var(--surface);overflow:hidden}
+.bilan>div{padding:12px 14px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);margin:0 -1px -1px 0}
+.bilan small{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.bilan strong{font-family:var(--f-display);font-size:26px;font-weight:700;line-height:1.15}
+.bilan strong i{font-style:normal;font-size:13px;font-family:var(--f-body);color:var(--muted);font-weight:500;margin-left:3px}
+.bilan .out{background:var(--ink);color:var(--bg)}
+.bilan .out small,.bilan .out strong i{color:color-mix(in srgb,var(--bg) 70%,transparent)}
+.datebar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.datebar input{width:auto}
+.datebar .lbl{font-family:var(--f-display);font-size:22px;text-transform:capitalize;letter-spacing:.03em;font-weight:600;margin-left:6px}
+.total-preview{font-family:var(--f-display);font-size:22px;font-weight:700}
+
+/* connexion */
+.auth{min-height:calc(100vh - 60px);display:grid;grid-template-columns:1.15fr 1fr;margin-inline:calc(-1*max(16px,env(safe-area-inset-left,0px))) calc(-1*max(16px,env(safe-area-inset-right,0px)))}
+.auth .pic{background:var(--soft);position:relative;overflow:hidden;min-height:260px}
+.auth .pic img,.auth .pic svg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.auth .pic .cap{position:absolute;left:0;right:0;bottom:0;padding:16px max(16px,env(safe-area-inset-left,0px));background:linear-gradient(transparent,rgba(0,0,0,.7));color:#fff}
+.auth .pic .cap b{font-family:var(--f-display);font-size:40px;letter-spacing:.06em;line-height:1}
+.auth .box{display:grid;align-content:center;gap:16px;padding:32px max(16px,env(safe-area-inset-right,0px));max-width:440px;width:100%;margin:0 auto}
+.auth .box .logo{width:64px;height:64px;border-radius:8px;object-fit:cover}
+.err{color:var(--bad);font-weight:600;min-height:20px}
+.banner{background:color-mix(in srgb,var(--amber) 25%,var(--surface));border:1px solid var(--amber);padding:10px 14px;border-radius:4px}
+.sub{display:flex;gap:8px}
+.sub .btn[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.thumb{max-width:240px;max-height:140px;border-radius:4px;border:1px solid var(--line);display:block}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:4px;z-index:50;max-width:90vw;box-shadow:0 4px 18px rgba(0,0,0,.3)}
+#toast.bad{background:var(--bad);color:#fff}
+.paperwrap{overflow-x:auto}
+@media (max-width:760px){.auth{grid-template-columns:1fr}.auth .pic{min-height:200px}.who .nm{display:none}}
+@media (prefers-reduced-motion:no-preference){.tabs button{transition:color .15s,border-color .15s}}
+</style>
+</head>
+<body>
+<div id="app"><div class="wrap" style="padding-top:60px"><p class="muted">Chargement…</p></div></div>
+<div id="toast" hidden></div>
+
+<script>
+(async function(){
+"use strict";
+/* ---------- constantes ---------- */
+const BASE_MATS=[{k:"G2",u:"T"},{k:"G1",u:"T"},{k:"SC",u:"T"},{k:"SD",u:"T"},{k:"Ciment",u:"T"},{k:"Adjuvant",u:"kg"}];
+let MATS=BASE_MATS.slice(),MU=Object.fromEntries(MATS.map(m=>[m.k,m.u]));
+function rebuildMats(){
+  const extra=[...S.matieres].sort(byName).filter(m=>m.name&&!BASE_MATS.some(b=>b.k.toLowerCase()===String(m.name).toLowerCase())).map(m=>({k:m.name,u:m.unit||"T"}));
+  MATS=BASE_MATS.concat(extra);MU=Object.fromEntries(MATS.map(m=>[m.k,m.u]));
+}
+const matOptions=()=>MATS.map(m=>`<option>${esc(m.k)}</option>`).join("");
+const COLS=["users","suppliers","clients","betons","entrees","sorties","conso","inv","matieres","pompes"];
+const MONTHS=["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"];
+const NAME="EL AIDI BETON";
+
+/* ---------- utilitaires ---------- */
+const $=(s,r=document)=>r.querySelector(s);
+const h=html=>{const t=document.createElement("template");t.innerHTML=html.trim();return t.content.firstElementChild};
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const nf=(n,d=2)=>Number(n||0).toLocaleString("fr-FR",{minimumFractionDigits:d,maximumFractionDigits:d});
+const dh=n=>nf(n,2)+" DH";
+const pad=n=>String(n).padStart(2,"0");
+const iso=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const today=()=>iso(new Date());
+const dLong=s=>new Date(s+"T00:00:00").toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+const dShort=s=>s.split("-").reverse().join("/");
+const sum=(a,f)=>a.reduce((t,x)=>t+(Number(f(x))||0),0);
+const pt=r=>Number(r.pompTotal??r.pompPrix??0)||0;
+const pv=r=>Number(r.pompVol??(r.pompId?r.vol:0))||0;
+const gt=r=>(Number(r.total)||0)+pt(r);
+const byName=(a,b)=>String(a.name||"").localeCompare(String(b.name||""),"fr");
+const lsGet=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
+const lsSet=(k,v)=>{try{v==null?localStorage.removeItem(k):localStorage.setItem(k,v)}catch(e){}};
+let toastT;
+function toast(msg,bad){const t=$("#toast");t.textContent=msg;t.className=bad?"bad":"";t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,3200)}
+async function run(fn){try{await fn()}catch(e){toast("Erreur : "+(e&&(e.message||e.code)||e),true)}}
+async function hashPw(pw,salt){
+  const txt=salt+":"+pw;
+  try{ if(crypto&&crypto.subtle){const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(txt));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("")}}catch(e){}
+  let a=5381,b=52711;for(const c of txt){a=((a*33)^c.charCodeAt(0))>>>0;b=((b*31)+c.charCodeAt(0))>>>0}return "f"+a.toString(16)+b.toString(16)
+}
+const rnd=()=>Math.random().toString(36).slice(2,12);
+
+/* ---------- base de données ---------- */
+
+/* ---------- mode autonome : base locale (navigateur) ---------- */
+function makeLocalDb(){
+  const KEY="aidi_db_v1";let data={};
+  try{data=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){data={}}
+  const subs=new Set(),notify=()=>subs.forEach(f=>f());
+  const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){throw {code:"quota_exceeded",message:"Le stockage du navigateur est plein ou bloqué."}}};
+  window.addEventListener("storage",e=>{if(e.key===KEY){try{data=JSON.parse(e.newValue||"{}")}catch(x){data={}}notify()}});
+  const clone=o=>JSON.parse(JSON.stringify(o));
+  const snap=(c,id)=>{const d=(data[c]||{})[id];return {id,exists:d!==undefined,data:()=>d===undefined?undefined:clone(d)}};
+  const docRef=(c,id)=>({id,
+    async set(d){(data[c]=data[c]||{})[id]=clone(d);save();notify()},
+    async update(d){if(!data[c]||data[c][id]===undefined)throw {code:"invalid_argument",message:"Document introuvable."};Object.assign(data[c][id],clone(d));save();notify()},
+    async delete(){if(data[c]&&id in data[c]){delete data[c][id];save();notify()}},
+    onSnapshot(next){const f=()=>next(snap(c,id));subs.add(f);setTimeout(f,0);return()=>subs.delete(f)}});
+  const colRef=c=>({
+    doc(id){return docRef(c,id||rnd()+rnd())},
+    async add(d){const r=docRef(c,rnd()+rnd());await r.set(d);return r},
+    onSnapshot(next){const f=()=>next({docs:Object.keys(data[c]||{}).sort().map(id=>snap(c,id))});subs.add(f);setTimeout(f,0);return()=>subs.delete(f)}});
+  return {collection:colRef,doc(p){const [c,id]=p.split("/");return docRef(c,id)},_local:true,
+    _export(){return JSON.stringify({app:"EL AIDI BETON",version:1,exportedAt:new Date().toISOString(),data},null,1)},
+    _import(txt){const j=JSON.parse(txt);if(!j||typeof j.data!=="object")throw new Error("Fichier de sauvegarde invalide.");data=j.data;save();notify()}};
+}
+const localAssets={async upload(file){
+  if(file.type==="image/svg+xml"||file.size<150000&&file.type!=="image/jpeg"&&file.type!=="image/png"&&file.type!=="image/webp"){
+    return await new Promise((ok,ko)=>{const r=new FileReader();r.onload=()=>ok({id:r.result});r.onerror=()=>ko(new Error("Lecture impossible"));r.readAsDataURL(file)})}
+  const url=URL.createObjectURL(file);
+  try{const img=await new Promise((ok,ko)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=()=>ko(new Error("Image illisible"));i.src=url});
+    const k=Math.min(1,900/Math.max(img.width,img.height)),c=document.createElement("canvas");c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);
+    c.getContext("2d").drawImage(img,0,0,c.width,c.height);return {id:c.toDataURL(file.type==="image/png"?"image/png":"image/jpeg",0.85)}}
+  finally{URL.revokeObjectURL(url)}
+}};
+const blobSrc=id=>String(id).startsWith("data:")?id:"/_blob/"+id;
+let db=null;try{db=await (window.claude&&window.claude.use?window.claude.use("db"):null)}catch(e){}
+const LOCALMODE=!db;if(LOCALMODE)db=makeLocalDb();
+let dlCap=null;try{dlCap=await (window.claude&&window.claude.use?window.claude.use("downloads"):null)}catch(e){}
+const userCap=null;
+const app=$("#app");
+if(!db){
+  let perm=null;try{perm=(window.claude&&window.claude.use)?await window.claude.use("permissions"):null}catch(e){}
+  let st="";try{if(perm){const m=await perm.state();st=Object.entries(m).map(([k,v])=>k+" : "+v).join(" · ")}}catch(e){}
+  app.innerHTML=`<div class="wrap" style="padding-top:48px;display:grid;gap:14px;max-width:560px"><h1 style="font-size:34px">${NAME}</h1>
+  <div class="banner"><b>La base de données n'est pas accessible.</b><br>Cela arrive quand la page est ouverte hors de claude.ai (lien dans un autre navigateur, aperçu, fichier enregistré) ou quand l'autorisation d'accès aux données a été refusée.</div>
+  <ol style="margin:0;padding-left:20px;display:grid;gap:6px"><li>Ouvrez la page depuis claude.ai, connecté au compte qui l'a créée.</li><li>Acceptez la demande d'autorisation si elle s'affiche.</li><li>Si vous avez refusé, utilisez « Gérer les permissions » ci-dessous, ou le menu Permissions de la page.</li></ol>
+  ${st?`<div class="muted small">État : ${esc(st)}</div>`:""}
+  <div class="actions" style="flex-wrap:wrap"><button class="btn primary" id="f-ask" type="button">Demander l'autorisation</button><button class="btn" id="f-man" type="button">Gérer les permissions</button><button class="btn" id="f-re" type="button">Recharger</button></div><div class="err" id="f-err"></div></div>`;
+  $("#f-re").onclick=()=>location.reload();
+  $("#f-ask").onclick=async()=>{try{if(!perm)throw 0;await perm.request();location.reload()}catch(e){$("#f-err").textContent="Impossible de demander l'autorisation ici. Ouvrez la page depuis claude.ai."}};
+  $("#f-man").onclick=async()=>{try{if(!perm)throw 0;await perm.manage();location.reload()}catch(e){$("#f-err").textContent="Panneau indisponible. Utilisez le menu Permissions de la page dans claude.ai."}};
+  return}
+const readOnly=userCap&&userCap.can&&userCap.can("data.write")===false;
+
+const S={settings:{}};const loaded={};
+COLS.forEach(c=>S[c]=[]);
+let raf=0;const kick=()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(onData)};
+COLS.forEach(c=>db.collection(c).onSnapshot(snap=>{S[c]=snap.docs.map(d=>({id:d.id,...d.data()}));loaded[c]=true;kick()},e=>{loaded[c]=true;kick()}));
+db.doc("settings/main").onSnapshot(s=>{S.settings=s.exists?s.data():{};loaded.settings=true;kick()},()=>{loaded.settings=true;kick()});
+const col=c=>db.collection(c);
+const addDoc=(c,d)=>run(()=>col(c).add({...d,at:Date.now()}));
+const delDoc=(c,id)=>run(()=>col(c).doc(id).delete());
+
+/* ---------- session ---------- */
+let sid=lsGet("aidi_session");
+const me=()=>S.users.find(u=>u.id===sid&&u.active!==false);
+const isAdmin=()=>{const u=me();return !!u&&u.role==="admin"};
+const canDel=r=>isAdmin()||(me()&&r.byId===me().id&&Date.now()-(r.at||0)<3600000);
+function logout(){sid=null;lsSet("aidi_session",null);shellBuilt=false;authMode="";onData()}
+
+/* ---------- visuels ---------- */
+const LOGO_SVG=`<svg viewBox="0 0 48 48" role="img" aria-label="Logo ${NAME}"><rect width="48" height="48" rx="6" fill="#1D2226"/><g fill="#F2A900"><path d="M8 9a5 5 0 0 1 5-3h4a5 5 0 0 1 5 3v17H8z"/><path d="M8 27h14l-4.5 9h-5z"/><path d="M26 9a5 5 0 0 1 5-3h4a5 5 0 0 1 5 3v17H26z"/><path d="M26 27h14l-4.5 9h-5z"/><rect x="6" y="40" width="36" height="3"/></g></svg>`;
+const PLANT_SVG=`<svg viewBox="0 0 600 420" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="600" height="420" fill="#C9CCCB"/><rect y="300" width="600" height="120" fill="#8E9290"/><g fill="#E9E7E1"><rect x="90" y="70" width="70" height="150" rx="10"/><rect x="180" y="40" width="70" height="180" rx="10"/><rect x="270" y="90" width="70" height="130" rx="10"/></g><g fill="#7C8280"><path d="M90 220h70l-26 46h-18z"/><path d="M180 220h70l-26 46h-18z"/><path d="M270 220h70l-26 46h-18z"/></g><rect x="360" y="110" width="90" height="190" fill="#4A5258"/><rect x="372" y="128" width="66" height="14" fill="#F2A900"/><rect x="372" y="152" width="66" height="14" fill="#F2A900"/><path d="M340 200L372 140" stroke="#4A5258" stroke-width="10"/><g fill="#B9AF9F"><path d="M30 300l40-60 40 60z"/><path d="M130 300l34-44 34 44z"/></g><rect x="470" y="262" width="100" height="40" rx="6" fill="#F2A900"/><circle cx="492" cy="306" r="14" fill="#1D2226"/><circle cx="548" cy="306" r="14" fill="#1D2226"/><path d="M480 262l20-50h54l12 50z" fill="#E9E7E1"/><rect y="296" width="600" height="8" fill="#1D2226"/></svg>`;
+const logoSrc=()=>S.settings.logo?blobSrc(S.settings.logo):null;
+const brandMark=()=>logoSrc()?`<img src="${logoSrc()}" alt="Logo ${NAME}">`:LOGO_SVG;
+
+/* ---------- aiguillage ---------- */
+let authMode="",shellBuilt=false,curView=null,curTab=lsGet("aidi_tab")||"journal";
+function onData(){
+  if(!COLS.every(c=>loaded[c])||!loaded.settings)return;
+  rebuildMats();
+  if(sid&&!me()){sid=null;lsSet("aidi_session",null);shellBuilt=false}
+  if(!me()){
+    const mode=S.users.length?"login":"setup";
+    if(authMode!==mode||!$("#authbox")){authMode=mode;shellBuilt=false;renderAuth(mode)}
+    else{const p=$("#authpic");if(p)p.innerHTML=picHTML()}
+    return}
+  authMode="";
+  if(!shellBuilt){buildShell();shellBuilt=true}
+  refreshHeader();
+  if(curView&&curView.update)curView.update();
+}
+const picHTML=()=>(S.settings.photo?`<img src="${blobSrc(S.settings.photo)}" alt="Photo de la centrale">`:PLANT_SVG)+`<div class="cap"><b>${NAME}</b><div>Gestion de la centrale à béton</div></div>`;
+
+/* ---------- connexion / création admin ---------- */
+function renderAuth(mode){
+  const setup=mode==="setup";
+  app.innerHTML=`<div class="auth"><div class="pic" id="authpic">${picHTML()}</div>
+  <form class="box" id="authbox" autocomplete="on">
+    <div>${logoSrc()?`<img class="logo" src="${logoSrc()}" alt="">`:`<div style="width:64px;height:64px">${LOGO_SVG}</div>`}</div>
+    <div><h1 style="font-size:34px">${setup?"Première utilisation":"Connexion"}</h1>
+    <p class="muted" style="margin:6px 0 0">${setup?"Créez le compte administrateur. Il pourra ensuite créer les autres utilisateurs.":"Entrez votre nom d'utilisateur et votre mot de passe."}</p></div>
+    ${setup?`<label class="fld"><span>Nom complet</span><input id="a-name" required autocomplete="name"></label>`:""}
+    <label class="fld"><span>Nom d'utilisateur</span><input id="a-user" required autocomplete="username" autocapitalize="none"></label>
+    <label class="fld"><span>Mot de passe</span><input id="a-pass" type="password" required minlength="${setup?6:1}" autocomplete="${setup?"new-password":"current-password"}"></label>
+    <div class="err" id="a-err" role="alert"></div>
+    <button class="btn primary" type="submit">${setup?"Créer le compte administrateur":"Se connecter"}</button>
+  </form></div>`;
+  $("#authbox").addEventListener("submit",async e=>{
+    e.preventDefault();const err=$("#a-err");err.textContent="";
+    const uname=$("#a-user").value.trim().toLowerCase(),pw=$("#a-pass").value;
+    if(setup){
+      if(S.users.length){err.textContent="Un administrateur existe déjà. Rechargez la page.";return}
+      const salt=rnd()+rnd();
+      try{const d={name:$("#a-name").value.trim(),username:uname,role:"admin",active:true,salt,hash:await hashPw(pw,salt),at:Date.now()};
+        const ref=await col("users").add(d);
+        if(!S.users.some(u=>u.id===ref.id))S.users.push({id:ref.id,...d});
+        sid=ref.id;lsSet("aidi_session",sid);authMode="";onData()}catch(x){err.textContent="Impossible de créer le compte : "+(x.message||x.code)}
+    }else{
+      const u=S.users.find(x=>x.username===uname);
+      if(!u||u.active===false||(await hashPw(pw,u.salt))!==u.hash){err.textContent="Nom d'utilisateur ou mot de passe incorrect.";return}
+      sid=u.id;lsSet("aidi_session",sid);authMode="";onData()}
+  });
+}
+
+/* ---------- coque ---------- */
+const TABS=[["journal","Journal du jour"],["partenaires","Fournisseurs & clients"],["exploitation","Exploitation"],["situations","Situations & attachements"],["utilisateurs","Utilisateurs",1],["parametres","Paramètres",1]];
+function buildShell(){
+  app.innerHTML=`<header class="top"><div class="wrap"><div class="brand" id="brand"></div><div class="who" id="who"></div></div></header><div class="hazard"></div>
+  <div class="wrap"><nav class="tabs" id="tabs" aria-label="Sections"></nav>${LOCALMODE?'<div class="banner small" style="margin-top:16px">Mode local : les données sont enregistrées dans ce navigateur, sur cet appareil. Faites une sauvegarde régulière dans Paramètres.</div>':""}${readOnly?'<div class="banner" style="margin-top:16px">Vous avez un accès en lecture seule à cette page. Demandez le niveau « Contributeur » pour saisir des données.</div>':""}<main id="view"></main></div>`;
+  $("#tabs").innerHTML=TABS.filter(t=>!t[2]||isAdmin()).map(t=>`<button data-tab="${t[0]}">${t[1]}</button>`).join("");
+  $("#tabs").addEventListener("click",e=>{const b=e.target.closest("[data-tab]");if(b)go(b.dataset.tab)});
+  if(!TABS.some(t=>t[0]===curTab&&(!t[2]||isAdmin())))curTab="journal";
+  go(curTab);
+}
+function refreshHeader(){
+  const b=$("#brand");if(b){const k=brandMark()+S.settings.logo;if(b.dataset.k!==k){b.dataset.k=k;b.innerHTML=`${brandMark()}<div><b>${NAME}</b><span>Gestion de la centrale à béton</span></div>`}}
+  const w=$("#who"),u=me();if(w&&u){const k=u.name+u.role;if(w.dataset.k!==k){w.dataset.k=k;w.innerHTML=`<span class="nm">${esc(u.name)}</span><span class="role">${u.role==="admin"?"Admin":"Utilisateur"}</span><button class="btn sm" id="out" type="button">Déconnexion</button>`;$("#out").onclick=logout}}
+}
+function go(t){
+  curTab=t;lsSet("aidi_tab",t);
+  document.querySelectorAll("#tabs [data-tab]").forEach(b=>b.setAttribute("aria-current",b.dataset.tab===t?"page":"false"));
+  const v=({journal:viewJournal,partenaires:viewPartners,exploitation:viewExploit,situations:viewSituations,utilisateurs:viewUsers,parametres:viewSettings})[t]();
+  curView=v;const m=$("#view");m.innerHTML="";m.appendChild(v.el);v.update();
+}
+
+/* ---------- suppression en deux temps ---------- */
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-del]");if(!b)return;
+  if(b.dataset.armed){const [c,id]=b.dataset.del.split(":");delDoc(c,id);return}
+  b.dataset.armed="1";b.dataset.txt=b.textContent;b.textContent="Confirmer ?";b.classList.add("armed");
+  setTimeout(()=>{if(b.isConnected){delete b.dataset.armed;b.textContent=b.dataset.txt;b.classList.remove("armed")}},3000);
+});
+const delBtn=(c,r)=>canDel(r)?`<button class="link danger" data-del="${c}:${r.id}" type="button">Supprimer</button>`:"";
+const setOptions=(sel,opts,keep)=>{const v=keep??sel.value;sel.innerHTML=opts;if([...sel.options].some(o=>o.value===v))sel.value=v};
+
+/* ======================= JOURNAL DU JOUR ======================= */
+function viewJournal(){
+  let date=today();
+  const el=h(`<div style="display:grid;gap:18px">
+    <div class="datebar"><button class="btn" id="j-prev" type="button" aria-label="Jour précédent">‹</button><input id="j-date" type="date"><button class="btn" id="j-next" type="button" aria-label="Jour suivant">›</button><button class="btn" id="j-today" type="button">Aujourd'hui</button><span class="lbl" id="j-lbl"></span></div>
+    <div class="bilan" id="j-bilan"></div>
+    <div class="cols">
+      <section class="panel"><header><h3>Entrées</h3><span class="muted small">Matières reçues ce jour</span></header>
+        <form class="grid" id="e-form">
+          <label class="fld"><span>Matière</span><select id="e-mat"></select></label>
+          <label class="fld"><span>Fournisseur</span><select id="e-sup" required></select></label>
+          <label class="fld"><span>Quantité <b class="unit" id="e-unit">T</b></span><input id="e-qty" type="number" step="any" min="0" inputmode="decimal" required></label>
+          <label class="fld"><span>Prix unitaire (DH)</span><input id="e-prix" type="number" step="any" min="0" inputmode="decimal"></label>
+          <label class="fld"><span>N° bon de livraison</span><input id="e-bl" autocomplete="off"></label>
+          <div class="actions"><button class="btn primary" type="submit">Ajouter l'entrée</button></div>
+        </form><div class="tw" id="e-list"></div></section>
+      <section class="panel"><header><h3>Sorties béton</h3><span class="muted small">Béton livré ce jour</span></header>
+        <form class="grid" id="s-form">
+          <label class="fld"><span>Client</span><select id="s-cli" required></select></label>
+          <label class="fld"><span>Type de béton</span><select id="s-type" required></select></label>
+          <label class="fld"><span>Volume (m³)</span><input id="s-vol" type="number" step="any" min="0" inputmode="decimal" required></label>
+          <label class="fld"><span>Prix (DH / m³)</span><input id="s-prix" type="number" step="any" min="0" inputmode="decimal" required></label>
+          <label class="fld"><span>N° bon</span><input id="s-bl" autocomplete="off"></label>
+          <label class="fld"><span>Chantier</span><input id="s-chan" autocomplete="off"></label>
+          <label class="fld"><span>Pompage (prestataire)</span><select id="s-pomp"></select></label>
+          <label class="fld"><span>Volume pompé (m³)</span><input id="s-pvol" type="number" step="any" min="0" inputmode="decimal" placeholder="= volume livré"></label>
+          <label class="fld"><span>Prix du pompage (DH / m³)</span><input id="s-ppu" type="number" step="any" min="0" inputmode="decimal"></label>
+          <div class="actions"><button class="btn primary" type="submit">Ajouter la sortie</button><span class="total-preview" id="s-total"></span></div>
+        </form><div class="tw" id="s-list"></div></section>
+    </div></div>`);
+  const q=s=>$(s,el);
+  const setDate=d=>{date=d;q("#j-date").value=d;draw()};
+  q("#j-date").onchange=e=>e.target.value&&setDate(e.target.value);
+  const shift=n=>{const d=new Date(date+"T00:00:00");d.setDate(d.getDate()+n);setDate(iso(d))};
+  q("#j-prev").onclick=()=>shift(-1);q("#j-next").onclick=()=>shift(1);q("#j-today").onclick=()=>setDate(today());
+  q("#e-mat").onchange=()=>q("#e-unit").textContent=MU[q("#e-mat").value];
+  const syncPrice=()=>{const b=S.betons.find(x=>x.id===q("#s-type").value);if(b&&b.price)q("#s-prix").value=b.price;total()};
+  const total=()=>{const vol=+q("#s-vol").value||0;let t=vol*(+q("#s-prix").value||0);if(q("#s-pomp").value)t+=(+q("#s-pvol").value||vol)*(+q("#s-ppu").value||0);q("#s-total").textContent=t?dh(t):""};
+  q("#s-type").onchange=syncPrice;q("#s-vol").oninput=total;q("#s-prix").oninput=total;q("#s-pvol").oninput=total;q("#s-ppu").oninput=total;
+  q("#s-pomp").onchange=()=>{const pr=S.pompes.find(x=>x.id===q("#s-pomp").value);if(pr&&pr.price)q("#s-ppu").value=pr.price;total()};
+
+  q("#e-form").onsubmit=e=>{e.preventDefault();
+    const sup=S.suppliers.find(x=>x.id===q("#e-sup").value),qty=+q("#e-qty").value;
+    if(!sup||!(qty>0)){toast("Choisissez un fournisseur et une quantité.",true);return}
+    const p=q("#e-prix").value;
+    run(async()=>{await addDoc("entrees",{date,mat:q("#e-mat").value,supId:sup.id,supName:sup.name,qty,prix:p===""?null:+p,bl:q("#e-bl").value.trim(),by:me().name,byId:me().id});
+      q("#e-qty").value="";q("#e-bl").value="";q("#e-qty").focus();toast("Entrée enregistrée")})};
+  q("#s-form").onsubmit=e=>{e.preventDefault();
+    const cli=S.clients.find(x=>x.id===q("#s-cli").value),bet=S.betons.find(x=>x.id===q("#s-type").value),vol=+q("#s-vol").value,prix=+q("#s-prix").value;
+    if(!cli||!bet||!(vol>0)||!(prix>0)){toast("Client, type de béton, volume et prix sont obligatoires.",true);return}
+    const pomp=S.pompes.find(x=>x.id===q("#s-pomp").value);
+    run(async()=>{await addDoc("sorties",{date,cliId:cli.id,cliName:cli.name,betonId:bet.id,beton:bet.name,vol,prix,total:Math.round(vol*prix*100)/100,bl:q("#s-bl").value.trim(),chantier:q("#s-chan").value.trim(),pompId:pomp?pomp.id:"",pompName:pomp?pomp.name:"",pompVol:pomp?(+q("#s-pvol").value||vol):0,pompPu:pomp?(+q("#s-ppu").value||0):0,pompTotal:pomp?Math.round((+q("#s-pvol").value||vol)*(+q("#s-ppu").value||0)*100)/100:0,by:me().name,byId:me().id});
+      q("#s-vol").value="";q("#s-bl").value="";q("#s-chan").value="";q("#s-pvol").value="";total();q("#s-vol").focus();toast("Sortie enregistrée")})};
+
+  function draw(){
+    q("#j-lbl").textContent=dLong(date);
+    const E=S.entrees.filter(r=>r.date===date).sort((a,b)=>a.at-b.at),O=S.sorties.filter(r=>r.date===date).sort((a,b)=>a.at-b.at);
+    q("#j-bilan").innerHTML=MATS.map(m=>{const t=sum(E.filter(r=>r.mat===m.k),r=>r.qty);return `<div><small>${m.k} entré</small><strong>${nf(t,t%1?2:0)}<i>${m.u}</i></strong></div>`}).join("")+
+      `<div class="out"><small>Béton sorti</small><strong>${nf(sum(O,r=>r.vol))}<i>m³</i></strong></div><div class="out"><small>Montant du jour</small><strong>${nf(sum(O,r=>gt(r)),0)}<i>DH</i></strong></div>`;
+    q("#e-list").innerHTML=E.length?`<table><thead><tr><th>Matière</th><th>Fournisseur</th><th class="n">Quantité</th><th class="n">Prix</th><th>BL</th><th></th></tr></thead><tbody>${E.map(r=>`<tr><td><span class="tag">${esc(r.mat)}</span></td><td>${esc(r.supName)}</td><td class="n">${nf(r.qty)} ${MU[r.mat]||""}</td><td class="n">${r.prix!=null?nf(r.prix):"—"}</td><td>${esc(r.bl)||"—"}<div class="muted small">${esc(r.by)}</div></td><td>${delBtn("entrees",r)}</td></tr>`).join("")}</tbody></table>`:`<div class="empty">Aucune entrée enregistrée ce jour.</div>`;
+    q("#s-list").innerHTML=O.length?`<table><thead><tr><th>Client</th><th>Béton</th><th class="n">m³</th><th class="n">Prix</th><th class="n">Total</th><th></th></tr></thead><tbody>${O.map(r=>`<tr><td>${esc(r.cliName)}<div class="muted small">${[r.bl&&"Bon "+esc(r.bl),esc(r.chantier),r.pompName&&"Pompage : "+esc(r.pompName)+" "+nf(pv(r))+" m³ × "+nf(r.pompPu||0)+" = "+nf(pt(r))+" DH",esc(r.by)].filter(Boolean).join(" · ")}</div></td><td><span class="tag">${esc(r.beton)}</span></td><td class="n">${nf(r.vol)}</td><td class="n">${nf(r.prix)}</td><td class="n">${nf(gt(r))}</td><td>${delBtn("sorties",r)}</td></tr>`).join("")}</tbody><tfoot><tr><td colspan="2">Total du jour</td><td class="n">${nf(sum(O,r=>r.vol))}</td><td></td><td class="n">${nf(sum(O,r=>gt(r)))}</td><td></td></tr></tfoot></table>`:`<div class="empty">Aucune sortie enregistrée ce jour.</div>`;
+  }
+  function update(){
+    q("#j-date").value=date;
+    setOptions(q("#e-mat"),matOptions());q("#e-unit").textContent=MU[q("#e-mat").value]||"";
+    setOptions(q("#s-pomp"),`<option value="">Sans pompage</option>`+[...S.pompes].sort(byName).map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join(""));
+    setOptions(q("#e-sup"),`<option value="">Choisir…</option>`+[...S.suppliers].sort(byName).map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join(""));
+    setOptions(q("#s-cli"),`<option value="">Choisir…</option>`+[...S.clients].sort(byName).map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join(""));
+    const first=!q("#s-type").options.length;
+    setOptions(q("#s-type"),`<option value="">${S.betons.length?"Choisir…":"Ajoutez des types dans Paramètres"}</option>`+[...S.betons].sort(byName).map(b=>`<option value="${b.id}">${esc(b.name)}</option>`).join(""));
+    if(first&&!q("#s-prix").value)syncPrice();
+    draw();
+  }
+  return {el,update};
+}
+
+/* ======================= FOURNISSEURS & CLIENTS ======================= */
+function crud(o){
+  const el=h(`<section class="panel"><header><h3>${o.title}</h3></header>
+    <form class="grid" id="${o.col}-form">${o.fields.map(f=>`<label class="fld ${f.wide?"wide":""}"><span>${f.label}</span><input id="${o.col}-${f.k}" type="${f.type||"text"}" ${f.req?"required":""} ${f.type==="number"?'step="any" min="0" inputmode="decimal"':""} autocomplete="off"></label>`).join("")}
+    <div class="actions"><button class="btn primary" type="submit" id="${o.col}-ok">Ajouter</button><button class="btn" type="button" id="${o.col}-cancel" hidden>Annuler</button></div></form>
+    <div class="tw" id="${o.col}-list"></div></section>`);
+  let editId=null;const q=s=>$(s,el);
+  const reset=()=>{editId=null;q("form").reset();q(`#${o.col}-ok`).textContent="Ajouter";q(`#${o.col}-cancel`).hidden=true};
+  q(`#${o.col}-cancel`).onclick=reset;
+  q("form").onsubmit=e=>{e.preventDefault();
+    const d={};o.fields.forEach(f=>{const v=q(`#${o.col}-${f.k}`).value.trim();d[f.k]=f.type==="number"?(v===""?0:+v):v});
+    const bad=o.validate&&o.validate(d,editId);if(bad){toast(bad,true);return}
+    run(async()=>{if(editId)await col(o.col).doc(editId).update(d);else await col(o.col).add({...d,at:Date.now()});toast(editId?"Modifié":"Ajouté");reset()})};
+  el.addEventListener("click",e=>{const b=e.target.closest("[data-edit]");if(!b)return;
+    const r=S[o.col].find(x=>x.id===b.dataset.edit);if(!r)return;editId=r.id;
+    o.fields.forEach(f=>q(`#${o.col}-${f.k}`).value=r[f.k]??"");q(`#${o.col}-ok`).textContent="Enregistrer";q(`#${o.col}-cancel`).hidden=false;q(`#${o.col}-name`).focus()});
+  function update(){
+    const rows=[...S[o.col]].sort(byName);
+    q(`#${o.col}-list`).innerHTML=rows.length?`<table><thead><tr>${o.cols.map(c=>`<th class="${c.n?"n":""}">${c.h}</th>`).join("")}<th></th></tr></thead><tbody>${rows.map(r=>`<tr>${o.cols.map(c=>`<td class="${c.n?"n":""}">${c.f(r)}</td>`).join("")}<td style="white-space:nowrap"><button class="link" data-edit="${r.id}" type="button">Modifier</button> ${isAdmin()?`<button class="link danger" data-del="${o.col}:${r.id}" type="button">Supprimer</button>`:""}</td></tr>`).join("")}</tbody></table>`:`<div class="empty">${o.empty}</div>`;
+  }
+  return {el,update};
+}
+function viewPartners(){
+  const ym=today().slice(0,7);
+  const sup=crud({col:"suppliers",title:"Fournisseurs",empty:"Aucun fournisseur. Ajoutez le premier avec le formulaire ci-dessus.",
+    fields:[{k:"name",label:"Nom du fournisseur",req:1,wide:1},{k:"phone",label:"Téléphone"},{k:"city",label:"Ville"},{k:"note",label:"Produits fournis",wide:1}],
+    cols:[{h:"Fournisseur",f:r=>`<b>${esc(r.name)}</b><div class="muted small">${esc(r.note)}</div>`},{h:"Contact",f:r=>`${esc(r.phone)||"—"}<div class="muted small">${esc(r.city)}</div>`},
+      {h:"Entrées du mois",f:r=>{const E=S.entrees.filter(x=>x.supId===r.id&&x.date.startsWith(ym));return E.length?MATS.map(m=>{const t=sum(E.filter(x=>x.mat===m.k),x=>x.qty);return t?`<span class="tag">${esc(m.k)}</span> ${nf(t)} ${m.u}`:""}).filter(Boolean).join("<br>"):"—"}},
+      {h:"Valeur totale",n:1,f:r=>dh(sum(S.entrees.filter(x=>x.supId===r.id),x=>x.qty*(x.prix||0)))}]});
+  const cli=crud({col:"clients",title:"Clients",empty:"Aucun client. Ajoutez le premier avec le formulaire ci-dessus.",
+    fields:[{k:"name",label:"Nom du client",req:1,wide:1},{k:"phone",label:"Téléphone"},{k:"city",label:"Ville"}],
+    cols:[{h:"Client",f:r=>`<b>${esc(r.name)}</b>`},{h:"Contact",f:r=>`${esc(r.phone)||"—"}<div class="muted small">${esc(r.city)}</div>`},
+      {h:"Volume du mois",n:1,f:r=>nf(sum(S.sorties.filter(x=>x.cliId===r.id&&x.date.startsWith(ym)),x=>x.vol))+" m³"},
+      {h:"Montant du mois (béton + pompage)",n:1,f:r=>dh(sum(S.sorties.filter(x=>x.cliId===r.id&&x.date.startsWith(ym)),gt))},
+      {h:"Montant total",n:1,f:r=>dh(sum(S.sorties.filter(x=>x.cliId===r.id),gt))}]});
+  const pom=crud({col:"pompes",title:"Prestataires de pompage",empty:"Aucun prestataire de pompage. Ajoutez le premier avec le formulaire ci-dessus.",
+    fields:[{k:"name",label:"Nom du prestataire",req:1,wide:1},{k:"phone",label:"Téléphone"},{k:"city",label:"Ville"},{k:"price",label:"Prix pompage par défaut (DH / m³)",type:"number"},{k:"note",label:"Matériel (pompe, camion…)",wide:1}],
+    cols:[{h:"Prestataire",f:r=>`<b>${esc(r.name)}</b><div class="muted small">${esc(r.note)}</div>`},{h:"Contact",f:r=>`${esc(r.phone)||"—"}<div class="muted small">${esc(r.city)}</div>`},
+      {h:"Pompages du mois",n:1,f:r=>{const O=S.sorties.filter(x=>x.pompId===r.id&&x.date.startsWith(ym));return O.length+" ("+nf(sum(O,pv))+" m³)"}},
+      {h:"Montant du mois",n:1,f:r=>dh(sum(S.sorties.filter(x=>x.pompId===r.id&&x.date.startsWith(ym)),pt))},
+      {h:"Montant total",n:1,f:r=>dh(sum(S.sorties.filter(x=>x.pompId===r.id),pt))}]});
+  const P=[["s","Fournisseurs",sup],["c","Clients",cli],["p","Prestataires de pompage",pom]];
+  const el=h(`<div style="display:grid;gap:18px"><div class="sub" style="flex-wrap:wrap">${P.map((x,k)=>`<button class="btn" data-p="${x[0]}" aria-pressed="${k===0}" type="button">${x[1]}</button>`).join("")}</div><div id="p-body"></div></div>`);
+  const body=$("#p-body",el);P.forEach((x,k)=>{body.append(x[2].el);x[2].el.hidden=k!==0});
+  el.addEventListener("click",e=>{const b=e.target.closest("[data-p]");if(!b)return;P.forEach(x=>{x[2].el.hidden=x[0]!==b.dataset.p});el.querySelectorAll("[data-p]").forEach(n=>n.setAttribute("aria-pressed",n===b))});
+  return {el,update(){P.forEach(x=>x[2].update())}};
+}
+
+/* ======================= EXPLOITATION ======================= */
+function stockRow(mat,ym){
+  const [y,mo]=ym.split("-").map(Number),start=ym+"-01",endDay=iso(new Date(y,mo,0));
+  const inv=S.inv.filter(r=>r.mat===mat).sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:(a.at||0)-(b.at||0));
+  const ref=[...inv].reverse().find(r=>r.date<start);
+  const baseD=ref?ref.date:"0000-00-00",base=ref?ref.qty:0;
+  const E=S.entrees.filter(r=>r.mat===mat),C=S.conso.filter(r=>r.mat===mat);
+  const opening=base+sum(E.filter(r=>r.date>baseD&&r.date<start),r=>r.qty)-sum(C.filter(r=>r.date>baseD&&r.date<start),r=>r.qty);
+  const phys=[...inv].reverse().find(r=>r.date>=start&&r.date<=endDay);
+  const upto=phys?phys.date:endDay;
+  const ent=sum(E.filter(r=>r.date>=start&&r.date<=upto),r=>r.qty),con=sum(C.filter(r=>r.date>=start&&r.date<=upto),r=>r.qty);
+  const theo=opening+ent-con;
+  return {mat,opening,ent,con,theo,phys:phys?phys.qty:null,upto,ecart:phys?phys.qty-theo:null,pct:phys&&theo>0?(phys.qty-theo)/theo*100:null,hasPhys:!!phys};
+}
+function viewExploit(){
+  let ym=today().slice(0,7);
+  const el=h(`<div style="display:grid;gap:18px">
+    <div class="datebar"><label class="fld" style="width:auto"><span>Mois d'analyse</span><input id="x-month" type="month" style="width:auto"></label></div>
+    <section class="panel"><header><h3>Stock et écart</h3><span class="muted small">Stock théorique = stock initial + entrées − consommation. Écart = stock physique − stock théorique.</span></header><div class="tw" id="x-stock"></div></section>
+    <div class="cols">
+      <section class="panel"><header><h3>Consommation de matière</h3></header>
+        <form class="grid" id="c-form"><label class="fld"><span>Date</span><input id="c-date" type="date" required></label>
+          <label class="fld"><span>Matière</span><select id="c-mat"></select></label>
+          <label class="fld"><span>Quantité consommée <b class="unit" id="c-unit">T</b></span><input id="c-qty" type="number" step="any" min="0" inputmode="decimal" required></label>
+          <div class="actions"><button class="btn primary" type="submit">Ajouter</button></div></form><div class="tw" id="c-list"></div></section>
+      <section class="panel"><header><h3>Stock physique (inventaire)</h3></header>
+        <form class="grid" id="i-form"><label class="fld"><span>Date de l'inventaire</span><input id="i-date" type="date" required></label>
+          <label class="fld"><span>Matière</span><select id="i-mat"></select></label>
+          <label class="fld"><span>Stock compté <b class="unit" id="i-unit">T</b></span><input id="i-qty" type="number" step="any" min="0" inputmode="decimal" required></label>
+          <div class="actions"><button class="btn primary" type="submit">Ajouter</button></div></form><div class="tw" id="i-list"></div></section>
+    </div>
+    <section class="panel"><header><h3>Entrées par mois</h3><span class="muted small" id="x-year"></span></header><div class="tw" id="x-year-t"></div></section>
+    <div class="cols">
+      <section class="panel"><header><h3>Entrées par fournisseur</h3><span class="muted small" id="x-m1"></span></header><div class="tw" id="x-sup"></div></section>
+      <section class="panel"><header><h3>Sorties par client</h3><span class="muted small" id="x-m2"></span></header><div class="tw" id="x-cli"></div></section>
+    </div>
+    <section class="panel"><header><h3>Pompage par prestataire</h3><span class="muted small" id="x-m4"></span></header><div class="tw" id="x-pump"></div></section>
+    <section class="panel"><header><h3>Béton sorti par type</h3><span class="muted small" id="x-m3"></span></header><div class="tw" id="x-bet"></div></section>
+  </div>`);
+  const q=s=>$(s,el);
+  q("#x-month").value=ym;q("#c-date").value=today();q("#i-date").value=today();
+  q("#x-month").onchange=e=>{if(e.target.value){ym=e.target.value;draw()}};
+  q("#c-mat").onchange=()=>q("#c-unit").textContent=MU[q("#c-mat").value];
+  q("#i-mat").onchange=()=>q("#i-unit").textContent=MU[q("#i-mat").value];
+  q("#c-form").onsubmit=e=>{e.preventDefault();const v=+q("#c-qty").value;if(!(v>=0)||q("#c-qty").value===""){return}
+    run(async()=>{await addDoc("conso",{date:q("#c-date").value,mat:q("#c-mat").value,qty:v,by:me().name,byId:me().id});q("#c-qty").value="";toast("Consommation enregistrée")})};
+  q("#i-form").onsubmit=e=>{e.preventDefault();const v=+q("#i-qty").value;if(q("#i-qty").value===""||!(v>=0))return;
+    run(async()=>{await addDoc("inv",{date:q("#i-date").value,mat:q("#i-mat").value,qty:v,by:me().name,byId:me().id});q("#i-qty").value="";toast("Inventaire enregistré")})};
+
+  function draw(){
+    setOptions(q("#c-mat"),matOptions());setOptions(q("#i-mat"),matOptions());
+    q("#c-unit").textContent=MU[q("#c-mat").value]||"";q("#i-unit").textContent=MU[q("#i-mat").value]||"";
+    const [y,mo]=ym.split("-").map(Number),mname=MONTHS[mo-1]+" "+y;
+    ["#x-m1","#x-m2","#x-m3","#x-m4"].forEach(s=>q(s).textContent=mname);
+    // stock
+    const rows=MATS.map(m=>stockRow(m.k,ym));
+    q("#x-stock").innerHTML=`<table><thead><tr><th>Matière</th><th class="n">Stock initial</th><th class="n">Entrées</th><th class="n">Consommation</th><th class="n">Stock théorique</th><th class="n">Stock physique</th><th class="n">Écart</th><th class="n">Écart %</th><th>Arrêté au</th></tr></thead><tbody>${rows.map(r=>{
+      const u=" "+MU[r.mat],cls=r.ecart==null?"":(Math.abs(r.pct??0)<=2&&r.ecart>=-0.0001?"pos":r.ecart<0?"neg":"warn");
+      return `<tr><td><span class="tag">${r.mat}</span></td><td class="n">${nf(r.opening)}${u}</td><td class="n">${nf(r.ent)}${u}</td><td class="n">${nf(r.con)}${u}</td><td class="n"><b>${nf(r.theo)}${u}</b></td><td class="n">${r.phys==null?'<span class="muted">non saisi</span>':nf(r.phys)+u}</td><td class="n ${cls}"><b>${r.ecart==null?"—":(r.ecart>0?"+":"")+nf(r.ecart)+u}</b></td><td class="n ${cls}">${r.pct==null?"—":(r.pct>0?"+":"")+nf(r.pct,1)+" %"}</td><td>${r.hasPhys?dShort(r.upto)+" (inventaire)":dShort(r.upto)+" (fin de mois)"}</td></tr>`}).join("")}</tbody></table>`;
+    // listes saisie
+    const cl=S.conso.filter(r=>r.date.startsWith(ym)).sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:b.at-a.at);
+    q("#c-list").innerHTML=cl.length?`<table><thead><tr><th>Date</th><th>Matière</th><th class="n">Quantité</th><th></th></tr></thead><tbody>${cl.map(r=>`<tr><td>${dShort(r.date)}</td><td><span class="tag">${r.mat}</span></td><td class="n">${nf(r.qty)} ${MU[r.mat]}</td><td>${delBtn("conso",r)}</td></tr>`).join("")}</tbody><tfoot><tr><td colspan="4" class="muted">${cl.length} ligne(s) en ${mname}</td></tr></tfoot></table>`:`<div class="empty">Aucune consommation saisie en ${mname}.</div>`;
+    const il=S.inv.filter(r=>r.date.startsWith(ym)).sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:b.at-a.at);
+    q("#i-list").innerHTML=il.length?`<table><thead><tr><th>Date</th><th>Matière</th><th class="n">Stock compté</th><th></th></tr></thead><tbody>${il.map(r=>`<tr><td>${dShort(r.date)}</td><td><span class="tag">${r.mat}</span></td><td class="n">${nf(r.qty)} ${MU[r.mat]}</td><td>${delBtn("inv",r)}</td></tr>`).join("")}</tbody></table>`:`<div class="empty">Aucun inventaire saisi en ${mname}.</div>`;
+    // entrées par mois (année)
+    q("#x-year").textContent="Année "+y;
+    const yr=S.entrees.filter(r=>r.date.startsWith(y+"-"));
+    q("#x-year-t").innerHTML=`<table><thead><tr><th>Mois</th>${MATS.map(m=>`<th class="n">${m.k} (${m.u})</th>`).join("")}<th class="n">Valeur (DH)</th></tr></thead><tbody>${MONTHS.map((n,i)=>{const k=y+"-"+pad(i+1),E=yr.filter(r=>r.date.startsWith(k));
+      return `<tr class="${i+1===mo?"cur":""}"><td>${n}</td>${MATS.map(m=>{const t=sum(E.filter(r=>r.mat===m.k),r=>r.qty);return `<td class="n">${t?nf(t):"—"}</td>`}).join("")}<td class="n">${E.length?nf(sum(E,r=>r.qty*(r.prix||0))):"—"}</td></tr>`}).join("")}</tbody><tfoot><tr><td>Total ${y}</td>${MATS.map(m=>`<td class="n">${nf(sum(yr.filter(r=>r.mat===m.k),r=>r.qty))}</td>`).join("")}<td class="n">${nf(sum(yr,r=>r.qty*(r.prix||0)))}</td></tr></tfoot></table>`;
+    // par fournisseur
+    const em=S.entrees.filter(r=>r.date.startsWith(ym)),sk=[...new Set(em.map(r=>r.supId||r.supName))];
+    q("#x-sup").innerHTML=sk.length?`<table><thead><tr><th>Fournisseur</th>${MATS.map(m=>`<th class="n">${m.k}</th>`).join("")}<th class="n">Valeur</th></tr></thead><tbody>${sk.map(k=>{const E=em.filter(r=>(r.supId||r.supName)===k);return `<tr><td>${esc(E[0].supName)}</td>${MATS.map(m=>{const t=sum(E.filter(r=>r.mat===m.k),r=>r.qty);return `<td class="n">${t?nf(t):"—"}</td>`}).join("")}<td class="n">${nf(sum(E,r=>r.qty*(r.prix||0)))}</td></tr>`}).join("")}</tbody><tfoot><tr><td>Total</td>${MATS.map(m=>`<td class="n">${nf(sum(em.filter(r=>r.mat===m.k),r=>r.qty))}</td>`).join("")}<td class="n">${nf(sum(em,r=>r.qty*(r.prix||0)))}</td></tr></tfoot></table>`:`<div class="empty">Aucune entrée en ${mname}.</div>`;
+    // par client
+    const om=S.sorties.filter(r=>r.date.startsWith(ym)),ck=[...new Set(om.map(r=>r.cliId||r.cliName))];
+    q("#x-cli").innerHTML=ck.length?`<table><thead><tr><th>Client</th><th class="n">Bons</th><th class="n">Volume (m³)</th><th class="n">Béton (DH)</th><th class="n">Pompage (DH)</th><th class="n">Total (DH)</th></tr></thead><tbody>${ck.map(k=>{const O=om.filter(r=>(r.cliId||r.cliName)===k);return `<tr><td>${esc(O[0].cliName)}</td><td class="n">${O.length}</td><td class="n">${nf(sum(O,r=>r.vol))}</td><td class="n">${nf(sum(O,r=>r.total))}</td><td class="n">${nf(sum(O,pt))}</td><td class="n"><b>${nf(sum(O,gt))}</b></td></tr>`}).join("")}</tbody><tfoot><tr><td>Total</td><td class="n">${om.length}</td><td class="n">${nf(sum(om,r=>r.vol))}</td><td class="n">${nf(sum(om,r=>r.total))}</td><td class="n">${nf(sum(om,pt))}</td><td class="n">${nf(sum(om,gt))}</td></tr></tfoot></table>`:`<div class="empty">Aucune sortie en ${mname}.</div>`;
+    const op=om.filter(r=>r.pompId||r.pompName),pk=[...new Set(op.map(r=>r.pompId||r.pompName))];
+    q("#x-pump").innerHTML=pk.length?`<table><thead><tr><th>Prestataire</th><th class="n">Pompages</th><th class="n">Volume pompé (m³)</th><th class="n">Montant (DH)</th></tr></thead><tbody>${pk.map(k=>{const O=op.filter(r=>(r.pompId||r.pompName)===k);return `<tr><td>${esc(O[0].pompName)}</td><td class="n">${O.length}</td><td class="n">${nf(sum(O,pv))}</td><td class="n">${nf(sum(O,pt))}</td></tr>`}).join("")}</tbody><tfoot><tr><td>Total</td><td class="n">${op.length}</td><td class="n">${nf(sum(op,pv))}</td><td class="n">${nf(sum(op,pt))}</td></tr></tfoot></table>`:`<div class="empty">Aucun pompage en ${mname}.</div>`;
+    const bk=[...new Set(om.map(r=>r.beton))].sort();
+    q("#x-bet").innerHTML=bk.length?`<table><thead><tr><th>Type de béton</th><th class="n">Volume (m³)</th><th class="n">Montant (DH)</th><th class="n">Prix moyen (DH/m³)</th></tr></thead><tbody>${bk.map(k=>{const O=om.filter(r=>r.beton===k),v=sum(O,r=>r.vol),t=sum(O,r=>r.total);return `<tr><td><span class="tag">${esc(k)}</span></td><td class="n">${nf(v)}</td><td class="n">${nf(t)}</td><td class="n">${v?nf(t/v):"—"}</td></tr>`}).join("")}</tbody></table>`:`<div class="empty">Aucune sortie en ${mname}.</div>`;
+  }
+  return {el,update:draw};
+}
+
+
+/* ======================= SITUATIONS & ATTACHEMENTS ======================= */
+const DOC_CSS=`.paper{background:#fff;color:#111;font:12px/1.45 "IBM Plex Sans",Arial,sans-serif;padding:24px;min-width:780px;border:1px solid #cfcfcf}
+.paper *{box-sizing:border-box}
+.paper h2{font:700 24px/1.1 "Barlow Condensed","Arial Narrow",Arial,sans-serif;letter-spacing:.06em;margin:0 0 4px;text-transform:uppercase}
+.paper h4{font:700 14px "Barlow Condensed","Arial Narrow",Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;margin:20px 0 6px;border-bottom:2px solid #111;padding-bottom:3px}
+.d-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;border-bottom:6px solid #F2A900;padding-bottom:12px}
+.d-brand{display:flex;gap:10px;align-items:center}
+.d-brand svg,.d-brand img{width:52px;height:52px;border-radius:6px;object-fit:cover}
+.d-brand b{font:700 24px/1 "Barlow Condensed","Arial Narrow",Arial,sans-serif;letter-spacing:.05em;display:block}
+.d-brand span{color:#555}
+.d-title{text-align:right}
+.d-party{margin-top:14px;padding:10px 12px;background:#f3f2ee;border-left:5px solid #F2A900}
+.d-party b{font-size:15px;display:block}
+.paper table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.paper th{background:#1d2226;color:#fff;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;text-align:left;padding:5px 6px;border:0;white-space:normal}
+.paper td{border-bottom:1px solid #d6d6d6;padding:4px 6px;vertical-align:top;background:transparent;color:#111}
+.paper th.n,.paper td.n{text-align:right;white-space:nowrap}
+.paper tbody tr:hover td{background:transparent}
+.paper tfoot td{font-weight:700;border-top:2px solid #111;background:#f3f2ee}
+.d-tot{margin:14px 0 0 auto;width:320px;max-width:100%}
+.d-tot div{display:flex;justify-content:space-between;padding:4px 8px;border-bottom:1px solid #d6d6d6}
+.d-tot .g{background:#1d2226;color:#fff;font-weight:700;font-size:14px;border:0}
+.d-sign{display:flex;justify-content:space-between;gap:24px;margin-top:36px}
+.d-sign div{flex:1;border-top:1px solid #111;padding-top:6px;text-align:center;min-height:90px}
+.d-empty{padding:30px;text-align:center;color:#555}`;
+const PAGE_PRINT=`@page{size:A4 landscape;margin:10mm}@media print{.top,.hazard,.tabs,.banner,.panel,#toast,body::before{display:none!important}body{padding:0!important;background:#fff!important}main{padding:0!important}.paper{border:0!important;padding:0!important;min-width:0!important}.paperwrap{overflow:visible}}`;
+{const st=document.createElement("style");st.textContent=DOC_CSS+PAGE_PRINT;document.head.appendChild(st)}
+const slug=t=>String(t).normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-zA-Z0-9]+/g,"-").replace(/^-|-$/g,"").toLowerCase()||"sans-nom";
+const csvNum=n=>String(Math.round((Number(n)||0)*100)/100).replace(".",",");
+const csvTxt=t=>'"'+String(t??"").replace(/"/g,'""')+'"';
+async function logoData(){
+  const id=S.settings.logo;if(!id)return LOGO_SVG;
+  if(String(id).startsWith("data:"))return `<img src="${id}" alt="">`;
+  try{const r=await fetch("/_blob/"+id);const b=await r.blob();const u=await new Promise((ok,ko)=>{const f=new FileReader();f.onload=()=>ok(f.result);f.onerror=ko;f.readAsDataURL(b)});return `<img src="${u}" alt="">`}catch(e){return LOGO_SVG}
+}
+async function saveFile(name,text,mime){
+  if(dlCap){try{await dlCap.save({filename:name,data:text});toast("Fichier prêt : "+name)}catch(e){if(!e||e.code!=="declined")toast("Téléchargement impossible ("+((e&&(e.code||e.message))||"erreur")+")",true)}return}
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["﻿"+text],{type:mime}));a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),2000);toast("Fichier téléchargé : "+name)
+}
+function statement(kind,id,from,to,tva,num){
+  const inR=r=>r.date>=from&&r.date<=to,byD=(a,b)=>a.date<b.date?-1:a.date>b.date?1:(a.at||0)-(b.at||0);
+  const isC=kind==="c",party=(isC?S.clients:S.suppliers).find(x=>x.id===id)||{name:"(supprimé)"};
+  const R=(isC?S.sorties.filter(r=>r.cliId===id&&inR(r)):S.entrees.filter(r=>r.supId===id&&inR(r))).sort(byD);
+  const head=`<div class="d-head"><div class="d-brand">%%LOGO%%<div><b>${NAME}</b><span>Centrale à béton</span></div></div>
+    <div class="d-title"><h2>Attachement ${isC?"client":"fournisseur"}</h2><div>N° ${esc(num)||"—"}</div><div>Période : du ${dShort(from)} au ${dShort(to)}</div></div></div>
+    <div class="d-party"><b>${esc(party.name)}</b><span>${[party.phone,party.city].filter(Boolean).map(esc).join(" · ")||"&nbsp;"}</span></div>`;
+  const sign=`<div class="d-sign"><div>Pour ${NAME}<br>(cachet et signature)</div><div>${isC?"Le client":"Le fournisseur"}<br>(nom, cachet et signature)</div></div>`;
+  let recap="",detail="",ht=0,csv=[];
+  if(isC){
+    const types=[...new Set(R.map(r=>r.beton))].sort();
+    const rows=types.map(t=>{const O=R.filter(r=>r.beton===t),v=sum(O,r=>r.vol),mb=sum(O,r=>r.total),Op=O.filter(r=>pv(r)>0),vp=sum(Op,pv),mp=sum(O,pt);
+      return {t,v,mb,pu:v?mb/v:0,vp,mp,pup:vp?mp/vp:0,tot:mb+mp}});
+    ht=sum(rows,r=>r.tot);
+    recap=`<h4>Récapitulatif par type de béton</h4><table><thead><tr><th>Type de béton</th><th class="n">Volume livré (m³)</th><th class="n">Prix moyen (DH/m³)</th><th class="n">Montant béton (DH)</th><th class="n">Volume pompé (m³)</th><th class="n">Prix pompage moyen (DH/m³)</th><th class="n">Montant pompage (DH)</th><th class="n">Total (DH)</th></tr></thead><tbody>${rows.map(r=>`<tr><td><b>${esc(r.t)}</b></td><td class="n">${nf(r.v)}</td><td class="n">${nf(r.pu)}</td><td class="n">${nf(r.mb)}</td><td class="n">${r.vp?nf(r.vp):"—"}</td><td class="n">${r.vp?nf(r.pup):"—"}</td><td class="n">${r.mp?nf(r.mp):"—"}</td><td class="n"><b>${nf(r.tot)}</b></td></tr>`).join("")}</tbody><tfoot><tr><td>Total</td><td class="n">${nf(sum(rows,r=>r.v))}</td><td></td><td class="n">${nf(sum(rows,r=>r.mb))}</td><td class="n">${nf(sum(rows,r=>r.vp))}</td><td></td><td class="n">${nf(sum(rows,r=>r.mp))}</td><td class="n">${nf(ht)}</td></tr></tfoot></table>`;
+    detail=`<h4>Détail des livraisons</h4><table><thead><tr><th>Date</th><th>N° bon</th><th>Chantier</th><th>Béton</th><th class="n">m³</th><th class="n">Prix (DH/m³)</th><th class="n">Montant béton</th><th>Prestataire pompage</th><th class="n">m³ pompés</th><th class="n">Prix pompage</th><th class="n">Montant pompage</th><th class="n">Total</th></tr></thead><tbody>${R.map(r=>`<tr><td>${dShort(r.date)}</td><td>${esc(r.bl)||"—"}</td><td>${esc(r.chantier)||"—"}</td><td>${esc(r.beton)}</td><td class="n">${nf(r.vol)}</td><td class="n">${nf(r.prix)}</td><td class="n">${nf(r.total)}</td><td>${esc(r.pompName)||"—"}</td><td class="n">${pv(r)?nf(pv(r)):"—"}</td><td class="n">${r.pompPu?nf(r.pompPu):"—"}</td><td class="n">${pt(r)?nf(pt(r)):"—"}</td><td class="n">${nf(gt(r))}</td></tr>`).join("")}</tbody></table>`;
+    csv=[["Date","N° bon","Chantier","Béton","m3","Prix DH/m3","Montant béton","Prestataire pompage","m3 pompés","Prix pompage DH/m3","Montant pompage","Total"].map(csvTxt).join(";")].concat(R.map(r=>[csvTxt(dShort(r.date)),csvTxt(r.bl),csvTxt(r.chantier),csvTxt(r.beton),csvNum(r.vol),csvNum(r.prix),csvNum(r.total),csvTxt(r.pompName),csvNum(pv(r)),csvNum(r.pompPu),csvNum(pt(r)),csvNum(gt(r))].join(";")),[["TOTAL HT","","","",csvNum(sum(R,r=>r.vol)),"",csvNum(sum(R,r=>r.total)),"",csvNum(sum(R,pv)),"",csvNum(sum(R,pt)),csvNum(ht)].map((x,i)=>i===0?csvTxt(x):x).join(";")]);
+  }else{
+    const mats=[...new Set(R.map(r=>r.mat))];
+    const rows=mats.map(m=>{const E=R.filter(r=>r.mat===m),q=sum(E,r=>r.qty),Ep=E.filter(r=>r.prix),qp=sum(Ep,r=>r.qty),mt=sum(E,r=>r.qty*(r.prix||0));return {m,q,mt,pu:qp?mt/qp:0,np:E.length-Ep.length}});
+    ht=sum(rows,r=>r.mt);
+    recap=`<h4>Récapitulatif par matière</h4><table><thead><tr><th>Matière</th><th class="n">Quantité</th><th>Unité</th><th class="n">Prix moyen (DH)</th><th class="n">Montant (DH)</th></tr></thead><tbody>${rows.map(r=>`<tr><td><b>${esc(r.m)}</b>${r.np?` <span style="color:#a15c00">(${r.np} ligne(s) sans prix)</span>`:""}</td><td class="n">${nf(r.q)}</td><td>${esc(MU[r.m]||"")}</td><td class="n">${r.pu?nf(r.pu):"—"}</td><td class="n"><b>${nf(r.mt)}</b></td></tr>`).join("")}</tbody><tfoot><tr><td>Total</td><td></td><td></td><td></td><td class="n">${nf(ht)}</td></tr></tfoot></table>`;
+    detail=`<h4>Détail des livraisons reçues</h4><table><thead><tr><th>Date</th><th>N° bon de livraison</th><th>Matière</th><th class="n">Quantité</th><th>Unité</th><th class="n">Prix unitaire (DH)</th><th class="n">Montant (DH)</th></tr></thead><tbody>${R.map(r=>`<tr><td>${dShort(r.date)}</td><td>${esc(r.bl)||"—"}</td><td>${esc(r.mat)}</td><td class="n">${nf(r.qty)}</td><td>${esc(MU[r.mat]||"")}</td><td class="n">${r.prix!=null?nf(r.prix):"—"}</td><td class="n">${nf(r.qty*(r.prix||0))}</td></tr>`).join("")}</tbody></table>`;
+    csv=[["Date","N° BL","Matière","Quantité","Unité","Prix unitaire","Montant"].map(csvTxt).join(";")].concat(R.map(r=>[csvTxt(dShort(r.date)),csvTxt(r.bl),csvTxt(r.mat),csvNum(r.qty),csvTxt(MU[r.mat]||""),r.prix!=null?csvNum(r.prix):"",csvNum(r.qty*(r.prix||0))].join(";")),[csvTxt("TOTAL HT"),"","","","","",csvNum(ht)].join(";"));
+  }
+  const tv=ht*tva/100;
+  const tot=`<div class="d-tot"><div><span>Total HT</span><b>${nf(ht)} DH</b></div>${tva>0?`<div><span>TVA ${nf(tva,tva%1?2:0)} %</span><b>${nf(tv)} DH</b></div><div class="g"><span>Total TTC</span><b>${nf(ht+tv)} DH</b></div>`:`<div class="g"><span>Total à payer</span><b>${nf(ht)} DH</b></div>`}</div>`;
+  if(tva>0)csv.push([csvTxt("TVA "+tva+" %"),...Array(isC?10:5).fill(""),csvNum(tv)].join(";"),[csvTxt("TOTAL TTC"),...Array(isC?10:5).fill(""),csvNum(ht+tv)].join(";"));
+  return {count:R.length,name:party.name,body:R.length?head+recap+detail+tot+sign:head+`<div class="d-empty">Aucune ${isC?"livraison de béton":"entrée de matière"} sur cette période.</div>`,csv:csv.join("\r\n"),file:`attachement-${isC?"client":"fournisseur"}-${slug(party.name)}-${from}_${to}`};
+}
+function viewSituations(){
+  let kind="c",cur=null;
+  const ym0=today().slice(0,7);
+  const el=h(`<div style="display:grid;gap:18px">
+    <section class="panel"><header><h3>Situation et attachement</h3><span class="muted small">Choisissez un client ou un fournisseur et la période. Le document se prépare ci-dessous.</span></header>
+      <div class="grid">
+        <label class="fld"><span>Type</span><select id="t-kind"><option value="c">Client</option><option value="s">Fournisseur</option></select></label>
+        <label class="fld"><span id="t-lbl">Client</span><select id="t-party"></select></label>
+        <label class="fld"><span>Mois</span><input id="t-month" type="month" value="${ym0}"></label>
+        <label class="fld"><span>Du</span><input id="t-from" type="date"></label>
+        <label class="fld"><span>Au</span><input id="t-to" type="date"></label>
+        <label class="fld"><span>TVA (%)</span><input id="t-tva" type="number" step="any" min="0" value="0" inputmode="decimal"></label>
+        <label class="fld"><span>N° d'attachement</span><input id="t-num" autocomplete="off"></label>
+      </div>
+      <div class="actions" style="flex-wrap:wrap"><button class="btn primary" id="t-dl" type="button">Télécharger l'attachement</button><button class="btn" id="t-csv" type="button">Exporter en CSV (Excel)</button><button class="btn" id="t-print" type="button" hidden>Imprimer / PDF</button></div>
+      <div class="muted small">Le fichier téléchargé s'ouvre dans le navigateur et s'imprime ou s'enregistre en PDF avec son bouton « Imprimer ».</div>
+    </section>
+    <div class="paperwrap"><div class="paper" id="t-doc"></div></div></div>`);
+  const q=s=>$(s,el);
+  const setMonth=v=>{const [Y,M]=v.split("-").map(Number);q("#t-from").value=v+"-01";q("#t-to").value=iso(new Date(Y,M,0))};
+  setMonth(ym0);
+  if(typeof LOCALMODE!=="undefined"&&LOCALMODE){q("#t-print").hidden=false;q("#t-print").onclick=()=>window.print()}
+  const btns=on=>["#t-dl","#t-csv","#t-print"].forEach(s=>q(s).disabled=!on);
+  function render(){
+    const id=q("#t-party").value,from=q("#t-from").value,to=q("#t-to").value;cur=null;
+    if(!id||!from||!to||from>to){q("#t-doc").innerHTML=`<div class="d-empty">${!id?"Choisissez un "+(kind==="c"?"client":"fournisseur")+" pour préparer l'attachement.":"La période est incorrecte."}</div>`;btns(false);return}
+    cur=statement(kind,id,from,to,+q("#t-tva").value||0,q("#t-num").value.trim());
+    q("#t-doc").innerHTML=cur.body.replace("%%LOGO%%",brandMark());btns(cur.count>0);
+  }
+  function fillParties(){
+    q("#t-lbl").textContent=kind==="c"?"Client":"Fournisseur";
+    setOptions(q("#t-party"),`<option value="">Choisir…</option>`+[...(kind==="c"?S.clients:S.suppliers)].sort(byName).map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join(""));
+  }
+  q("#t-kind").onchange=e=>{kind=e.target.value;q("#t-party").value="";fillParties();render()};
+  q("#t-month").onchange=e=>{if(e.target.value){setMonth(e.target.value);render()}};
+  ["#t-party","#t-from","#t-to","#t-tva","#t-num"].forEach(s=>{q(s).oninput=render;q(s).onchange=render});
+  q("#t-dl").onclick=async()=>{if(!cur)return;
+    const logo=await logoData();
+    const doc=`<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Attachement ${esc(cur.name)}</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap"><style>body{margin:16px;background:#f3f2ee;font-family:Arial,sans-serif}.bar{max-width:1100px;margin:0 auto 12px}.bar button{font:600 14px Arial;padding:9px 16px;border:0;background:#F2A900;color:#1d2226;border-radius:4px;cursor:pointer}.paper{max-width:1100px;margin:0 auto}${DOC_CSS}@page{size:A4 landscape;margin:10mm}@media print{.bar{display:none}body{margin:0;background:#fff}.paper{border:0;padding:0;min-width:0;max-width:none}}</style></head><body><div class="bar"><button onclick="window.print()">Imprimer / enregistrer en PDF</button></div><div class="paper">${cur.body.replace("%%LOGO%%",logo)}</div></body></html>`;
+    saveFile(cur.file+".html",doc,"text/html")};
+  q("#t-csv").onclick=()=>{if(cur)saveFile(cur.file+".csv",cur.csv,"text/csv")};
+  return {el,update(){fillParties();render()}};
+}
+
+/* ======================= UTILISATEURS (admin) ======================= */
+function viewUsers(){
+  const el=h(`<div class="cols">
+    <section class="panel"><header><h3>Nouvel utilisateur</h3></header>
+      <form class="grid" id="u-form"><label class="fld"><span>Nom complet</span><input id="u-name" required autocomplete="off"></label>
+        <label class="fld"><span>Nom d'utilisateur</span><input id="u-user" required autocomplete="off" autocapitalize="none"></label>
+        <label class="fld"><span>Mot de passe</span><input id="u-pass" type="text" minlength="6" required autocomplete="off"></label>
+        <label class="fld"><span>Rôle</span><select id="u-role"><option value="user">Utilisateur (saisie)</option><option value="admin">Administrateur</option></select></label>
+        <div class="actions"><button class="btn primary" type="submit">Créer le compte</button></div></form>
+      <div class="err" id="u-err" role="alert"></div>
+      <h3 style="margin-top:6px">Changer un mot de passe</h3>
+      <form class="grid" id="r-form"><label class="fld"><span>Utilisateur</span><select id="r-user" required></select></label>
+        <label class="fld"><span>Nouveau mot de passe</span><input id="r-pass" type="text" minlength="6" required autocomplete="off"></label>
+        <div class="actions"><button class="btn" type="submit">Enregistrer</button></div></form></section>
+    <section class="panel"><header><h3>Comptes</h3></header><div class="tw" id="u-list"></div></section></div>`);
+  const q=s=>$(s,el);
+  q("#u-form").onsubmit=async e=>{e.preventDefault();const err=q("#u-err");err.textContent="";
+    const un=q("#u-user").value.trim().toLowerCase();
+    if(S.users.some(u=>u.username===un)){err.textContent="Ce nom d'utilisateur existe déjà.";return}
+    const salt=rnd()+rnd();
+    run(async()=>{await col("users").add({name:q("#u-name").value.trim(),username:un,role:q("#u-role").value,active:true,salt,hash:await hashPw(q("#u-pass").value,salt),at:Date.now()});q("#u-form").reset();toast("Compte créé")})};
+  q("#r-form").onsubmit=e=>{e.preventDefault();const salt=rnd()+rnd();
+    run(async()=>{await col("users").doc(q("#r-user").value).update({salt,hash:await hashPw(q("#r-pass").value,salt)});q("#r-pass").value="";toast("Mot de passe modifié")})};
+  el.addEventListener("click",e=>{const b=e.target.closest("[data-toggle]");if(!b)return;const u=S.users.find(x=>x.id===b.dataset.toggle);
+    if(u)run(()=>col("users").doc(u.id).update({active:u.active===false}))});
+  function update(){
+    const us=[...S.users].sort(byName);
+    setOptions(q("#r-user"),us.map(u=>`<option value="${u.id}">${esc(u.name)} (${esc(u.username)})</option>`).join(""));
+    q("#u-list").innerHTML=`<table><thead><tr><th>Nom</th><th>Rôle</th><th>État</th><th></th></tr></thead><tbody>${us.map(u=>`<tr><td><b>${esc(u.name)}</b><div class="muted small">${esc(u.username)}</div></td><td>${u.role==="admin"?"Administrateur":"Utilisateur"}</td><td>${u.active===false?'<span class="neg">Désactivé</span>':'<span class="pos">Actif</span>'}</td><td style="white-space:nowrap">${u.id===sid?'<span class="muted small">Vous</span>':`<button class="link" data-toggle="${u.id}" type="button">${u.active===false?"Réactiver":"Désactiver"}</button> <button class="link danger" data-del="users:${u.id}" type="button">Supprimer</button>`}</td></tr>`).join("")}</tbody></table>`;
+  }
+  return {el,update};
+}
+
+/* ======================= PARAMETRES (admin) ======================= */
+function viewSettings(){
+  const bet=crud({col:"betons",title:"Types de béton et prix",empty:"Aucun type de béton. Ajoutez B25, B30, etc.",
+    fields:[{k:"name",label:"Type de béton",req:1},{k:"price",label:"Prix par défaut (DH / m³)",type:"number",req:1}],
+    cols:[{h:"Type",f:r=>`<span class="tag">${esc(r.name)}</span>`},{h:"Prix par défaut (DH / m³)",n:1,f:r=>r.price?nf(r.price):'<span class="warn">à renseigner</span>'}]});
+  const mat=crud({col:"matieres",title:"Autres matières premières",empty:"Aucune matière ajoutée. G2, G1, SC, SD, Ciment et Adjuvant existent déjà.",
+    fields:[{k:"name",label:"Nom de la matière",req:1},{k:"unit",label:"Unité (T, kg, L, m³)",req:1}],
+    validate:(d,id)=>{const n=d.name.toLowerCase();if(BASE_MATS.some(b=>b.k.toLowerCase()===n)||S.matieres.some(m=>m.id!==id&&String(m.name).toLowerCase()===n))return "Cette matière existe déjà.";return ""},
+    cols:[{h:"Matière",f:r=>`<span class="tag">${esc(r.name)}</span>`},{h:"Unité",f:r=>esc(r.unit)},{h:"Utilisée",n:1,f:r=>S.entrees.filter(x=>x.mat===r.name).length+" entrée(s)"}]});
+  const el=h(`<div class="cols"><section class="panel"><header><h3>Logo et photo</h3></header><div id="s-assets"></div></section></div>`);
+  el.appendChild(bet.el);el.appendChild(mat.el);
+  mat.el.appendChild(h(`<p class="muted small" style="margin:0">Évitez de renommer ou supprimer une matière déjà utilisée : ses mouvements n'apparaîtraient plus dans les tableaux.</p>`));
+  const bk=h(`<section class="panel"><header><h3>Sauvegarde des données</h3></header><p class="muted" style="margin:0">Les données sont stockées dans ce navigateur. Exportez un fichier de sauvegarde régulièrement, et importez-le pour restaurer ou pour copier les données sur un autre appareil.</p><div class="actions" style="flex-wrap:wrap"><button class="btn primary" id="bk-exp" type="button">Exporter la sauvegarde</button><label class="btn" for="bk-imp" style="display:inline-flex;align-items:center">Importer une sauvegarde</label><input id="bk-imp" type="file" accept="application/json,.json" hidden></div><div class="err" id="bk-msg" role="status"></div></section>`);
+  if(db._local){el.appendChild(bk);
+    $("#bk-exp",bk).onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([db._export()],{type:"application/json"}));a.download="el-aidi-beton-"+today()+".json";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),2000);toast("Sauvegarde exportée")};
+    $("#bk-imp",bk).onchange=async e=>{const f=e.target.files[0];if(!f)return;const m=$("#bk-msg",bk);
+      try{const t=await f.text();db._import(t);m.className="pos";m.textContent="Sauvegarde importée.";toast("Sauvegarde importée")}catch(x){m.className="err";m.textContent="Import impossible : "+(x.message||x.code)}e.target.value=""}}
+  const box=$("#s-assets",el);
+  let assets=null;
+  const load=(async()=>{assets=localAssets})();
+  const put=(field,id)=>run(()=>db.doc("settings/main").set({...S.settings,[field]:id}));
+  box.addEventListener("change",async e=>{const inp=e.target.closest("[data-up]");if(!inp||!inp.files[0])return;
+    await load;if(!assets){toast("Téléversement non disponible pour votre compte.",true);return}
+    run(async()=>{const r=await assets.upload(inp.files[0]);await put(inp.dataset.up,r.id);toast("Image enregistrée")});inp.value=""});
+  box.addEventListener("click",e=>{const b=e.target.closest("[data-clear]");if(b)put(b.dataset.clear,null)});
+  let sig="";
+  function update(){
+    const k=(S.settings.logo||"")+"|"+(S.settings.photo||"");
+    if(k!==sig){sig=k;
+      box.innerHTML=[["logo","Logo","Format carré conseillé. Sans logo, le logo par défaut est utilisé.",S.settings.logo,`<div style="width:72px;height:72px">${LOGO_SVG}</div>`],["photo","Photo de la centrale","Affichée sur la page de connexion.",S.settings.photo,""]].map(([f,t,d,id,fb])=>`<div style="display:grid;gap:8px;margin-bottom:18px"><b>${t}</b><div class="muted small">${d}</div>${id?`<img class="thumb" src="${blobSrc(id)}" alt="${t}">`:fb}<label class="fld"><span>Choisir une image</span><input type="file" id="up-${f}" data-up="${f}" accept="image/png,image/jpeg,image/webp,image/svg+xml"></label>${id?`<div><button class="link danger" data-clear="${f}" type="button">Retirer l'image</button></div>`:""}</div>`).join("");
+    }
+    bet.update();mat.update();
+  }
+  return {el,update};
+}
+})();
+</script>
+</body>
+</html>
